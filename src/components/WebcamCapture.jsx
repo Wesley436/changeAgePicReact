@@ -38,6 +38,11 @@ export default function WebcamCapture() {
             if(isLoading){
                 return;
             }
+            if(afterImage){
+                setBeforeImage('');
+                setAfterImage('');
+                return;
+            }
             setIsLoading(true);
 
             const image = webcamRef.current.getScreenshot({width: 1920, height: 1440});
@@ -69,11 +74,13 @@ export default function WebcamCapture() {
                         if(json.url){
                             setAfterImage(json.url);
                         }
+                    }else{
+                        setBeforeImage('');
                     }
                     setIsLoading(false);
                 });
         },
-        [webcamRef, setAfterImage, setBeforeImage, isLoading, setIsLoading]
+        [webcamRef, setBeforeImage, isLoading, setIsLoading, afterImage, setAfterImage,]
     );
 
     return (
