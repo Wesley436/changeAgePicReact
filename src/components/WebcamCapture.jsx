@@ -2,51 +2,44 @@ import Webcam from "react-webcam";
 
 import { useRef, useCallback, useContext, useState } from "react";
 import { ImageContext } from "../context/ImageContextProvider";
-import { Button, Grid } from '@mui/material';
-import { TextField } from "@mui/material";
+import { Grid } from '@mui/material';
+import { LoadingButton } from '@mui/lab';
+import banner from "../images/banner.png";
 
 import '../styles/App.css';
 
 const imageColumnStyle = {
-    backgroundColor: '#EEE',
-    borderRadius: '0.5rem',
+    padding: '1rem',
 }
 
-const ageInputStyle = {
-    margin: '1rem',
-    width: '90%',
-    '.MuiInputBase-root': {
-        fontSize: '1rem',
-        borderRadius: '1rem',
-    },
-}
-
-const buttonStyle = {
-    width: '90%',
-    fontSize: '1rem',
-    margin: '1rem',
-    borderRadius: '1rem',
+const labelStyle = {
+    fontSize: '3rem',
+    fontWeight: 'bold',
+    display: 'flex',
+    paddingLeft: '2rem',
 }
 
 const imageStyle = {
-    border: '0.1rem solid black',
-    maxWidth: '80%',
-    maxHeight:'80%',
+    maxWidth: '95%',
+    maxHeight:'95%',
+    padding: '1rem',
 }
 
 export default function WebcamCapture() {
     const {
         capturedImage, setCapturedImage,
-        targetAge, setTargetAge,
+        isLoading, setIsLoading,
         agedImage, setAgedImage,
     } = useContext(ImageContext);
-
-    const [changeButtonDisabled, setChangeButtonDisabled] = useState(false);
 
     const webcamRef = useRef(null);
     const capture = useCallback(
         () => {
-            setChangeButtonDisabled(true);
+            if(isLoading){
+                return;
+            }
+            setIsLoading(true);
+
             const image = webcamRef.current.getScreenshot({width: 1920, height: 1440});
             setCapturedImage(image);
 
@@ -57,7 +50,7 @@ export default function WebcamCapture() {
                     'image': image,
                     "ageInfos":[
                         {
-                            "Age": parseInt(targetAge)
+                            "Age": 70
                         }
                     ]
                 })
@@ -77,72 +70,37 @@ export default function WebcamCapture() {
                             setAgedImage(json.url);
                         }
                     }
-                    setChangeButtonDisabled(false);
+                    setIsLoading(false);
                 });
         },
-        [webcamRef, targetAge, setAgedImage]
+        [webcamRef, setAgedImage, setCapturedImage, isLoading, setIsLoading]
     );
 
-    function handleAgeInput(e) {
-        let input = e.target.value;
-        input = input.replace(/[^0-9.]/g, '').replace(/(\..*?)\..*/g, '$1').replace(/^0[^.]/, '0');
-        let targetAge = parseInt(input);
-        if(targetAge>100){
-            targetAge=100;
-        }
-        if(targetAge<1){
-            targetAge=1;
-        }
-        if(!targetAge){
-            targetAge='';
-        }
-        setTargetAge(targetAge);
-    }
-
-    function printResultImage(){
-        const iframe = document.createElement('iframe');
-        iframe.style.height = 0;
-        iframe.style.visibility = 'hidden';
-        iframe.style.width = 0;
-
-        iframe.setAttribute('srcdoc', '<html><body></body></html>');
-
-        document.body.appendChild(iframe);
-        iframe.onload =
-        ()=>{
-            const image = document.getElementById('agedImage').cloneNode();
-            image.style.width = '100%';
-            image.style.height = '100%';
-            const body = iframe.contentDocument.body;
-            body.style.textAlign = 'center';
-            body.appendChild(image);
-            console.log(iframe);
-            setTimeout(function() {
-                iframe.contentWindow.print();
-            }, 1000);
-        };
-    }
-
-    let isTargetAgeEmpty = !targetAge;
-
     return (
-        <div style={{margin:'1rem'}}>
+        <div style={{}}>
             <Grid container>
-                <Grid item lg={10} sx={imageColumnStyle}>
-
-                    <span>
-                        <img id='agedImage' src={agedImage} style={imageStyle}/>
-                    </span>
-                    <span hidden={!capturedImage}>
-                        <img src={capturedImage}  style={imageStyle}/>
-                    </span>
+                <Grid item lg={12}>
+                    <img src={banner} onClick={capture}/>
                 </Grid>
-                <Grid item lg={2} sx={{height:'100%', padding:'1rem'}}>
-                    <Webcam width='100%' screenshotQuality='1' audio={false} ref={webcamRef} screenshotFormat="image/jpeg"/>
-                    <TextField sx={ageInputStyle} placeholder='Age' value={targetAge} onChange={(e) => {handleAgeInput(e)}}/>
-                    <Button disabled={changeButtonDisabled||isTargetAgeEmpty} variant="contained" sx={buttonStyle} onClick={capture}>Change age</Button>
-                    <Button disabled={!agedImage} variant="contained" sx={buttonStyle} onClick={printResultImage}>Print result</Button>
-                    <Button disabled={!agedImage} variant="contained" sx={buttonStyle} onClick={() => {setCapturedImage('');setAgedImage('')}}>Reset</Button>
+                <Grid item lg={12} sx={imageColumnStyle}>
+                    <span hidden={!isLoading}>
+                        <LoadingButton loading={true} sx={{width: '95%', height: '95%', scale: '5'}}/>
+                    </span>
+                    <div hidden={!agedImage || isLoading}>
+                        <div>
+                            <label style={labelStyle}>After:</label>
+                        </div>
+                        <span>
+                            <img src={agedImage} style={imageStyle} onClick={() => {setCapturedImage('');setAgedImage('')}}/>
+                        </span>
+                    </div>
+                    <span>
+                        <div>
+                            <label style={labelStyle}>Before:</label>
+                        </div>
+                        <img hidden={!capturedImage} src={capturedImage}  style={imageStyle} onClick={() => {setCapturedImage('');setAgedImage('')}}/>
+                        <Webcam hidden={capturedImage} width='100%' screenshotQuality='1' audio={false} ref={webcamRef} screenshotFormat="image/jpeg"/>
+                    </span>
                 </Grid>
             </Grid>
         </div>

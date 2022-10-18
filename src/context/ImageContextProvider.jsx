@@ -4,14 +4,15 @@ export const ImageContext = createContext();
 
 export default function ImageContextProvider(props) {
     const [capturedImage, setCapturedImage] = useState('');
-    const [targetAge, setTargetAge] = useState('');
+    const [isLoading, setIsLoading] = useState('');
     const [agedImage, setAgedImage] = useState('');
+    const [printImage, setPrintImage] = useState('');
 
     return (
         <ImageContext.Provider
             value={{
                 capturedImage, setCapturedImage,
-                targetAge, setTargetAge,
+                isLoading, setIsLoading,
                 agedImage, setAgedImage,
             }}
         >
