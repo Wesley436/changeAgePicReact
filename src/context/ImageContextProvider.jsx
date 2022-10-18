@@ -3,17 +3,16 @@ import { createContext, useState } from 'react';
 export const ImageContext = createContext();
 
 export default function ImageContextProvider(props) {
-    const [capturedImage, setCapturedImage] = useState('');
+    const [beforeImage, setBeforeImage] = useState('');
     const [isLoading, setIsLoading] = useState('');
-    const [agedImage, setAgedImage] = useState('');
-    const [printImage, setPrintImage] = useState('');
+    const [afterImage, setAfterImage] = useState('');
 
     return (
         <ImageContext.Provider
             value={{
-                capturedImage, setCapturedImage,
+                beforeImage, setBeforeImage,
                 isLoading, setIsLoading,
-                agedImage, setAgedImage,
+                afterImage, setAfterImage,
             }}
         >
             {props.children}

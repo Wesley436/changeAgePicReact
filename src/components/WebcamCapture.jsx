@@ -1,10 +1,10 @@
 import Webcam from "react-webcam";
 
-import { useRef, useCallback, useContext, useState } from "react";
+import { useRef, useCallback, useContext } from "react";
 import { ImageContext } from "../context/ImageContextProvider";
 import { Grid } from '@mui/material';
 import { LoadingButton } from '@mui/lab';
-import banner from "../images/banner.png";
+import bannerTransparent from "../images/bannerTransparent.png";
 
 import '../styles/App.css';
 
@@ -27,9 +27,9 @@ const imageStyle = {
 
 export default function WebcamCapture() {
     const {
-        capturedImage, setCapturedImage,
+        beforeImage, setBeforeImage,
         isLoading, setIsLoading,
-        agedImage, setAgedImage,
+        afterImage, setAfterImage,
     } = useContext(ImageContext);
 
     const webcamRef = useRef(null);
@@ -41,7 +41,7 @@ export default function WebcamCapture() {
             setIsLoading(true);
 
             const image = webcamRef.current.getScreenshot({width: 1920, height: 1440});
-            setCapturedImage(image);
+            setBeforeImage(image);
 
             const requestOptions = {
                 method: 'POST',
@@ -67,39 +67,39 @@ export default function WebcamCapture() {
                     if(json){
                         console.log(json);
                         if(json.url){
-                            setAgedImage(json.url);
+                            setAfterImage(json.url);
                         }
                     }
                     setIsLoading(false);
                 });
         },
-        [webcamRef, setAgedImage, setCapturedImage, isLoading, setIsLoading]
+        [webcamRef, setAfterImage, setBeforeImage, isLoading, setIsLoading]
     );
 
     return (
         <div style={{}}>
             <Grid container>
                 <Grid item lg={12}>
-                    <img src={banner} onClick={capture}/>
+                    <img alt={'banner'} src={bannerTransparent} onClick={capture} style={{width:'100%'}}/>
                 </Grid>
                 <Grid item lg={12} sx={imageColumnStyle}>
                     <span hidden={!isLoading}>
-                        <LoadingButton loading={true} sx={{width: '95%', height: '95%', scale: '5'}}/>
+                        <LoadingButton loading={true} sx={{width: '95%', height: '95%', scale: '10'}}/>
                     </span>
-                    <div hidden={!agedImage || isLoading}>
+                    <div hidden={!afterImage || isLoading}>
                         <div>
                             <label style={labelStyle}>After:</label>
                         </div>
                         <span>
-                            <img src={agedImage} style={imageStyle} onClick={() => {setCapturedImage('');setAgedImage('')}}/>
+                            <img src={afterImage} alt={'after'} style={imageStyle} onClick={() => {setBeforeImage('');setAfterImage('')}}/>
                         </span>
                     </div>
                     <span>
                         <div>
                             <label style={labelStyle}>Before:</label>
                         </div>
-                        <img hidden={!capturedImage} src={capturedImage}  style={imageStyle} onClick={() => {setCapturedImage('');setAgedImage('')}}/>
-                        <Webcam hidden={capturedImage} width='100%' screenshotQuality='1' audio={false} ref={webcamRef} screenshotFormat="image/jpeg"/>
+                        <img hidden={!beforeImage} alt={'before'} src={beforeImage}  style={imageStyle} onClick={() => {setBeforeImage('');setAfterImage('')}}/>
+                        <Webcam hidden={beforeImage} width='100%' screenshotQuality='1' audio={false} ref={webcamRef} screenshotFormat="image/jpeg"/>
                     </span>
                 </Grid>
             </Grid>
