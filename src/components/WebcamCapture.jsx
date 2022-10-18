@@ -4,7 +4,7 @@ import { useRef, useCallback, useContext } from "react";
 import { ImageContext } from "../context/ImageContextProvider";
 import { Grid } from '@mui/material';
 import { LoadingButton } from '@mui/lab';
-import bannerTransparent from "../images/bannerTransparent.png";
+import banner from "../images/banner.png";
 
 import '../styles/App.css';
 
@@ -87,7 +87,7 @@ export default function WebcamCapture() {
         <div style={{}}>
             <Grid container>
                 <Grid item lg={12}>
-                    <img alt={'banner'} src={bannerTransparent} onClick={capture} style={{width:'100%'}}/>
+                    <img alt={'banner'} src={banner} onClick={capture} style={{width:'100%'}}/>
                 </Grid>
                 <Grid item lg={12} sx={imageColumnStyle}>
                     <span hidden={!isLoading}>
@@ -95,7 +95,7 @@ export default function WebcamCapture() {
                     </span>
                     <div hidden={!afterImage || isLoading}>
                         <div>
-                            <label style={labelStyle}>After:</label>
+                            <label style={labelStyle}>{'After (後):'}</label>
                         </div>
                         <span>
                             <img src={afterImage} alt={'after'} style={imageStyle} onClick={() => {setBeforeImage('');setAfterImage('')}}/>
@@ -103,7 +103,7 @@ export default function WebcamCapture() {
                     </div>
                     <span>
                         <div>
-                            <label style={labelStyle}>Before:</label>
+                            <label style={labelStyle}>{'Before (前):'}</label>
                         </div>
                         <img hidden={!beforeImage} alt={'before'} src={beforeImage}  style={imageStyle} onClick={() => {setBeforeImage('');setAfterImage('')}}/>
                         <Webcam hidden={beforeImage} width='100%' screenshotQuality='1' audio={false} ref={webcamRef} screenshotFormat="image/jpeg"/>
